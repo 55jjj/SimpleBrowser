@@ -9,20 +9,26 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - run: |
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 11076708
+          packages: 'platforms;android-34 build-tools;34.0.0 platform-tools'
+      - name: Unzip project
+        run: |
           ls -la
           ZIP=$(find . -maxdepth 1 -name "*.zip" | head -1)
           echo "Found ZIP: $ZIP"
           unzip -o "$ZIP"
           ls -la
-          cat settings.gradle
-          cat app/build.gradle
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: 8.2
       - name: Build APK
-        run: gradle assembleDebug --stacktrace
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+        run: |
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+          gradle wrapper --gradle-version 8.2
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
       - uses: actions/upload-artifact@v4
         with:
           name: app-debug
