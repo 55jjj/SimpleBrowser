@@ -10,7 +10,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - run: |
-          unzip SimpleBrowser.zip
+          ls -la
+          ZIP=$(find . -maxdepth 1 -name "*.zip" | head -1)
+          echo "Found ZIP: $ZIP"
+          unzip "$ZIP"
           cd SimpleBrowser
           gradle wrapper --gradle-version 8.2
           chmod +x gradlew
